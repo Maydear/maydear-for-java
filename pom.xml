@@ -32,6 +32,19 @@
             <url>http://repository.tubsoft.com/repository/maven-public/</url>
         </repository>
     </repositories>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>tubsoft-snapshots</id>
+            <name>Snapshots</name>
+            <url>http://repository.tubsoft.com/repository/maven-snapshots/</url>
+            <uniqueVersion>true</uniqueVersion>
+        </snapshotRepository>
+        <repository>
+            <id>tubsoft-releases</id>
+            <name>Releases</name>
+            <url>http://repository.tubsoft.com/repository/maven-releases/</url>
+        </repository>
+    </distributionManagement>
     <developers>
         <developer>
             <id>kelvin</id>
