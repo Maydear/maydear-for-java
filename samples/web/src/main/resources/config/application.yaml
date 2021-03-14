@@ -1,0 +1,41 @@
+server:
+  port: 8080
+  undertow:
+    buffer-size: 512
+    threads:
+      worker: 10
+      io: 5
+    no-request-timeout: 60000
+
+spring:
+  session:
+    timeout: 30m
+  servlet:
+    multipart:
+      max-file-size: 62914560
+      max-request-size: 62914560
+
+logging:
+  level:
+    sun.rmi: off
+    javax.management: off
+    com.zaxxer.hikari: info
+    org.mybatis: debug
+    org.springframework: error
+    org.springframework.web: error
+    org.springframework.boot: error
+    org.springframework.boot.autoconfigure: error
+    com.baomidou: debug
+    com.baomidou.mybatisplus.core.MybatisConfiguration: error
+    org.apache.http.impl.conn: error
+    org.hibernate: info
+    org.mybatis.spring.mapper: info
+    okhttp3.internal.http2: info
+
+maydear:
+  authorization:
+    store:
+      memory:
+        expired: 3600
+        initialCapacity: 1000
+        maximumSize: 100000

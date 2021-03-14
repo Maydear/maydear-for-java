@@ -1,0 +1,14 @@
+# -------starter×Ô¶¯×°Åä---------
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.maydear.core.authorization.JwtAuthorizationAutoConfiguration,\
+com.maydear.core.authorization.CustomizeAuthorizationAutoConfiguration,\
+com.maydear.core.authorization.CertificateAuthorizationAutoConfiguration,\
+com.maydear.core.authorization.memory.MemoryTicketStoreAutoConfiguration,\
+com.maydear.core.authorization.redis.RedisTicketStoreAutoConfiguration,\
+com.maydear.core.authorization.redis.RedisReactiveAutoConfiguration,\
+com.maydear.core.authorization.redis.RedisRepositoriesAutoConfiguration
+
+# RedisAccessTokenStoreAutoConfiguration,\
+# LettuceConnectionConfiguration,\
+# RedisConnectionConfiguration
+

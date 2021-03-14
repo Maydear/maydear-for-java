@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>maydear-core</artifactId>
+        <groupId>com.maydear.core</groupId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>maydear-dependencies</artifactId>
+    <name>Maydear Dependencies</name>
+    <description>类库依赖集合包（全家桶）</description>
+    <dependencies>
+        <!-- region 项目包-->
+        <dependency>
+            <groupId>com.maydear.core</groupId>
+            <artifactId>maydear-framework-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.maydear.core</groupId>
+            <artifactId>maydear-framework-jackson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.maydear.core</groupId>
+            <artifactId>maydear-framework-mapstruct</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.maydear.core</groupId>
+            <artifactId>maydear-framework-spring</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.maydear.core</groupId>
+            <artifactId>maydear-framework-spring-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.maydear.core</groupId>
+            <artifactId>maydear-authorization-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.maydear.core</groupId>
+            <artifactId>maydear-authorization-customize</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.maydear.core</groupId>
+            <artifactId>maydear-authorization-certificate</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.maydear.core</groupId>
+            <artifactId>maydear-authorization-jwt</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.maydear.core</groupId>
+            <artifactId>maydear-authorization-store-memory</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.maydear.core</groupId>
+            <artifactId>maydear-authorization-store-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.maydear.core</groupId>
+            <artifactId>maydear-authorization-spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.maydear.core</groupId>
+            <artifactId>maydear-authorization-spring-security</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.maydear.core</groupId>
+            <artifactId>maydear-springboot-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.maydear.core</groupId>
+            <artifactId>maydear-springcloud-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.maydear.core</groupId>
+            <artifactId>maydear-springcloud-gateway</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.maydear.core</groupId>
+            <artifactId>maydear-data-mybatis-plus</artifactId>
+        </dependency>
+        <!-- endregion-->
+    </dependencies>
+</project>
