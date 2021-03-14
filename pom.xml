@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.maydear.core</groupId>
     <artifactId>maydear-core</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <modules>
         <module>framework</module>
         <module>springboot</module>
@@ -30,17 +32,6 @@
             <url>http://repository.tubsoft.com/repository/maven-public/</url>
         </repository>
     </repositories>
-    <developers>
-        <developer>
-            <id>kelvin</id>
-            <name>kelvin liang</name>
-            <organization>匠人科技</organization>
-            <organizationUrl>http://tubsoft.com</organizationUrl>
-            <roles>
-                <role>Project leader</role>
-            </roles>
-        </developer>
-    </developers>
     <properties>
         <!--System propeties-->
         <main.basedir>${basedir}</main.basedir>
