@@ -30,6 +30,17 @@
             <url>http://repository.tubsoft.com/repository/maven-public/</url>
         </repository>
     </repositories>
+    <developers>
+        <developer>
+            <id>kelvin</id>
+            <name>kelvin liang</name>
+            <organization>匠人科技</organization>
+            <organizationUrl>http://tubsoft.com</organizationUrl>
+            <roles>
+                <role>Project leader</role>
+            </roles>
+        </developer>
+    </developers>
     <properties>
         <!--System propeties-->
         <main.basedir>${basedir}</main.basedir>

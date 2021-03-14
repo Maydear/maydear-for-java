@@ -32,6 +32,7 @@ out/
 .settings
 .vs/
 .vscode/
+target/
 
 # Maven Tools
 *.releaseBackup
