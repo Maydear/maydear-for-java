@@ -17,12 +17,13 @@ package com.maydear.core.framework.io;
 
 import com.maydear.core.framework.exception.FileSummaryParseException;
 import com.maydear.core.framework.util.Base64Utils;
+import com.maydear.core.framework.util.DateTimeUtils;
 import com.maydear.core.framework.util.UUIDUtils;
-import lombok.Data;
-import lombok.Setter;
+import lombok.*;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.StringJoiner;
@@ -34,7 +35,13 @@ import java.util.StringJoiner;
  * @version 1.0.0
  */
 @Data
-public class FileSummary {
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
+@NoArgsConstructor
+@Builder
+@With
+public class FileSummary implements Serializable {
+
+    private static final long serialVersionUID = 5942953451852501636L;
 
     /**
      * 分割符号
@@ -44,12 +51,17 @@ public class FileSummary {
     /**
      * 串结构长度
      */
-    private static final int ARRAY_LENGTH = 8;
+    private static final int ARRAY_LENGTH = 12;
 
     /**
      * 文件标志
      */
     private String id;
+
+    /**
+     * 摘要类型
+     */
+    private String type;
 
     /**
      * 标志
@@ -72,6 +84,11 @@ public class FileSummary {
     private String originalFilename;
 
     /**
+     * 文件扩展名
+     */
+    private String extendFilename;
+
+    /**
      * 扩展信息
      */
     private String extended;
@@ -83,7 +100,7 @@ public class FileSummary {
     private String storagePath;
 
     /**
-     * 存储目录
+     * 存储根目录
      */
     private String storageDirectory;
 
@@ -109,16 +126,20 @@ public class FileSummary {
 
         if (fileSummaryStringArray.length == ARRAY_LENGTH) {
             try {
-                FileSummary fileSummary = new FileSummary();
-                fileSummary.setId(fileSummaryStringArray[0]);
-                fileSummary.setTag(fileSummaryStringArray[1]);
-                fileSummary.setMd5(fileSummaryStringArray[2]);
-                fileSummary.setContentType(fileSummaryStringArray[3]);
-                fileSummary.setOriginalFilename(fileSummaryStringArray[4]);
-                fileSummary.setSize(Long.parseLong(fileSummaryStringArray[5]));
-                fileSummary.setStoragePath(fileSummaryStringArray[6]);
-                fileSummary.setExtended(fileSummaryStringArray[7]);
-                return fileSummary;
+                return FileSummary.builder()
+                    .type(fileSummaryStringArray[0])
+                    .id(fileSummaryStringArray[1])
+                    .tag(fileSummaryStringArray[2])
+                    .md5(fileSummaryStringArray[3])
+                    .contentType(fileSummaryStringArray[4])
+                    .originalFilename(fileSummaryStringArray[5])
+                    .extendFilename(fileSummaryStringArray[6])
+                    .size(Long.parseLong(fileSummaryStringArray[7]))
+                    .storagePath(fileSummaryStringArray[8])
+                    .storageDirectory(fileSummaryStringArray[9])
+                    .createTime(DateTimeUtils.formUnixTimeMilliseconds(Long.parseLong(fileSummaryStringArray[10])))
+                    .extended(fileSummaryStringArray[11])
+                    .build();
             } catch (NumberFormatException numberFormatException) {
                 throw new FileSummaryParseException();
             }
@@ -129,8 +150,6 @@ public class FileSummary {
 
     /**
      * 生成存储路径
-     *
-     * @return
      */
     public void buildStoragePath() {
         if (ObjectUtils.isEmpty(createTime)) {
@@ -146,7 +165,7 @@ public class FileSummary {
     /**
      * 获取存储路径
      *
-     * @return
+     * @return 返回完整存储路径
      */
     public String getStoragePath() {
         if (StringUtils.isBlank(storagePath)) {
@@ -163,13 +182,17 @@ public class FileSummary {
      */
     public String encodeBase64() {
         StringJoiner stringJoiner = new StringJoiner(String.valueOf(SEPARATOR))
+            .add(getType())
             .add(getId())
             .add(getTag())
             .add(getMd5())
             .add(getContentType())
             .add(getOriginalFilename())
+            .add(getExtendFilename())
             .add(String.valueOf(getSize()))
             .add(getStoragePath())
+            .add(getStorageDirectory())
+            .add(String.valueOf(DateTimeUtils.toUnixTimeMilliseconds(getCreateTime())))
             .add(getExtended());
 
         return Base64Utils.encode(stringJoiner.toString());
