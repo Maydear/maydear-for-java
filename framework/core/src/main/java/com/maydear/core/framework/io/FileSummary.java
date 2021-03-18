@@ -39,7 +39,7 @@ import java.util.StringJoiner;
 @NoArgsConstructor
 @Builder
 @With
-public class FileSummary implements Serializable {
+public class FileSummary implements Serializable, Cloneable {
 
     private static final long serialVersionUID = 5942953451852501636L;
 
@@ -51,7 +51,17 @@ public class FileSummary implements Serializable {
     /**
      * 串结构长度
      */
-    private static final int ARRAY_LENGTH = 12;
+    private static final int ARRAY_LENGTH = 10;
+
+    /**
+     * 临时
+     */
+    public static final String TEMP_TYPE = "T";
+
+    /**
+     * 持久
+     */
+    public static final String PERSISTENCE_TYPE = "P";
 
     /**
      * 文件标志
@@ -84,20 +94,9 @@ public class FileSummary implements Serializable {
     private String originalFilename;
 
     /**
-     * 文件扩展名
-     */
-    private String extendFilename;
-
-    /**
      * 扩展信息
      */
     private String extended;
-
-    /**
-     * 存储路径
-     */
-    @Setter
-    private String storagePath;
 
     /**
      * 存储根目录
@@ -123,23 +122,51 @@ public class FileSummary implements Serializable {
     public static FileSummary parse(String fileSummaryBase64Str) {
         String fileSummaryString = Base64Utils.decode(fileSummaryBase64Str);
         String[] fileSummaryStringArray = StringUtils.split(fileSummaryString, SEPARATOR);
-
+        int typeIndex = 0;
+        int idIndex = 1;
+        int tagIndex = 2;
+        int md5Index = 3;
+        int contentTypeIndex = 4;
+        int originalFilenameIndex = 5;
+        int sizeIndex = 6;
+        int storageDirectoryIndex = 7;
+        int createTimeIndex = 8;
+        int extendedIndex = 9;
         if (fileSummaryStringArray.length == ARRAY_LENGTH) {
             try {
-                return FileSummary.builder()
-                    .type(fileSummaryStringArray[0])
-                    .id(fileSummaryStringArray[1])
-                    .tag(fileSummaryStringArray[2])
-                    .md5(fileSummaryStringArray[3])
-                    .contentType(fileSummaryStringArray[4])
-                    .originalFilename(fileSummaryStringArray[5])
-                    .extendFilename(fileSummaryStringArray[6])
-                    .size(Long.parseLong(fileSummaryStringArray[7]))
-                    .storagePath(fileSummaryStringArray[8])
-                    .storageDirectory(fileSummaryStringArray[9])
-                    .createTime(DateTimeUtils.formUnixTimeMilliseconds(Long.parseLong(fileSummaryStringArray[10])))
-                    .extended(fileSummaryStringArray[11])
-                    .build();
+                FileSummary fileSummary = new FileSummary();
+                if (StringUtils.isNotBlank(fileSummaryStringArray[typeIndex])) {
+                    fileSummary.setType(fileSummaryStringArray[typeIndex]);
+                }
+                if (StringUtils.isNotBlank(fileSummaryStringArray[idIndex])) {
+                    fileSummary.setId(fileSummaryStringArray[idIndex]);
+                }
+                if (StringUtils.isNotBlank(fileSummaryStringArray[tagIndex])) {
+                    fileSummary.setTag(fileSummaryStringArray[tagIndex]);
+                }
+                if (StringUtils.isNotBlank(fileSummaryStringArray[md5Index])) {
+                    fileSummary.setMd5(fileSummaryStringArray[md5Index]);
+                }
+                if (StringUtils.isNotBlank(fileSummaryStringArray[contentTypeIndex])) {
+                    fileSummary.setContentType(fileSummaryStringArray[contentTypeIndex]);
+                }
+                if (StringUtils.isNotBlank(fileSummaryStringArray[originalFilenameIndex])) {
+                    fileSummary.setOriginalFilename(fileSummaryStringArray[originalFilenameIndex]);
+                }
+
+                if (StringUtils.isNotBlank(fileSummaryStringArray[sizeIndex])) {
+                    fileSummary.setSize(Long.parseLong(fileSummaryStringArray[sizeIndex]));
+                }
+                if (StringUtils.isNotBlank(fileSummaryStringArray[storageDirectoryIndex])) {
+                    fileSummary.setStorageDirectory(fileSummaryStringArray[storageDirectoryIndex]);
+                }
+                if (StringUtils.isNotBlank(fileSummaryStringArray[createTimeIndex])) {
+                    fileSummary.setCreateTime(DateTimeUtils.formUnixTimeMilliseconds(Long.parseLong(fileSummaryStringArray[createTimeIndex])));
+                }
+                if (StringUtils.isNotBlank(fileSummaryStringArray[extendedIndex])) {
+                    fileSummary.setExtended(fileSummaryStringArray[extendedIndex]);
+                }
+                return fileSummary;
             } catch (NumberFormatException numberFormatException) {
                 throw new FileSummaryParseException();
             }
@@ -149,30 +176,29 @@ public class FileSummary implements Serializable {
     }
 
     /**
-     * 生成存储路径
+     * 获取存储路径
+     *
+     * @return 返回完整存储路径
      */
-    public void buildStoragePath() {
+    public String getStoragePath() {
         if (ObjectUtils.isEmpty(createTime)) {
             createTime = LocalDateTime.now();
         }
         if (StringUtils.isBlank(id)) {
             id = UUIDUtils.generateNoUnderline();
         }
-        String dateDirectory = MessageFormat.format("{0}/{1}/{2}", createTime.getYear(), createTime.getMonth(), createTime.getDayOfMonth());
-        storagePath = MessageFormat.format("{0}/{1}/{2}", storageDirectory, dateDirectory, id);
+        String dateDirectory = MessageFormat.format("{0}/{1}/{2}", String.valueOf(createTime.getYear()), String.valueOf(createTime.getMonth().getValue()), String.valueOf(createTime.getDayOfMonth()));
+        return MessageFormat.format("{0}/{1}/{2}", storageDirectory, dateDirectory, id);
     }
 
     /**
-     * 获取存储路径
-     *
-     * @return 返回完整存储路径
+     * 文件扩展名
      */
-    public String getStoragePath() {
-        if (StringUtils.isBlank(storagePath)) {
-            buildStoragePath();
+    public String getExtendFilename(){
+        if(StringUtils.isNotBlank(originalFilename)){
+            return StringUtils.substringBeforeLast(originalFilename,".");
         }
-
-        return storagePath;
+        return null;
     }
 
     /**
@@ -188,13 +214,21 @@ public class FileSummary implements Serializable {
             .add(getMd5())
             .add(getContentType())
             .add(getOriginalFilename())
-            .add(getExtendFilename())
             .add(String.valueOf(getSize()))
-            .add(getStoragePath())
             .add(getStorageDirectory())
             .add(String.valueOf(DateTimeUtils.toUnixTimeMilliseconds(getCreateTime())))
             .add(getExtended());
 
         return Base64Utils.encode(stringJoiner.toString());
+    }
+
+    public boolean isTempFile() {
+        return StringUtils.equalsAnyIgnoreCase(type, "");
+    }
+
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }

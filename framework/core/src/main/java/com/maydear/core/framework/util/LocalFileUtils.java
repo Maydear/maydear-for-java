@@ -140,6 +140,10 @@ public class LocalFileUtils {
         Assert.isNotNull(source, "[原始路径]不能为空。");
         Assert.isNotNull(target, "[目标路径]不能为空。");
         try {
+            if(!Files.exists(source)){
+                return;
+            }
+            LocalFileUtils.createFileIfExists(target);
             Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             throw new FailedCopyFileException();

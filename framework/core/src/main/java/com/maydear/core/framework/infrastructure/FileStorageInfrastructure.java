@@ -26,21 +26,19 @@ import com.maydear.core.framework.io.FileSummary;
 public interface FileStorageInfrastructure {
 
     /**
-     * 将文件写入
+     * 将文件写入临时目录
      *
      * @param bytes       字节形式的文件内容
      * @param fileSummary 文件摘要
      */
-    void write(FileSummary fileSummary, byte[] bytes);
+    void writeTemp(FileSummary fileSummary, byte[] bytes);
 
     /**
-     * 复制文件
+     * 将文件写入
      *
-     * @param targetDirectory   目标目录
-     * @param sourceFileSummary 源文件信息
-     * @return 返回复制后得文件信息
+     * @param fileSummary 文件摘要
      */
-    FileSummary copy(FileSummary sourceFileSummary, final String targetDirectory);
+    FileSummary persistence(final FileSummary fileSummary);
 
     /**
      * 将文件读取

@@ -19,6 +19,7 @@ import com.maydear.core.framework.exception.NotFoundFileException;
 import com.maydear.core.framework.io.FileSummary;
 import com.maydear.core.framework.util.LocalFileUtils;
 import com.maydear.core.framework.util.OsUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -33,24 +34,21 @@ import java.nio.file.Paths;
  * @author kelvin.liang
  * @version 1.0.0
  */
+@Slf4j
 public class LocalFileStorageInfrastructure implements FileStorageInfrastructure {
 
     /**
-     * 本地文件存储的根目录
+     *
      */
-    private final String rootPath;
+    private final LocalFileOptions options;
 
     /**
      * 构造函数
      *
-     * @param rootPath 根目录
+     * @param options 本地文件系统选项
      */
-    public LocalFileStorageInfrastructure(String rootPath) {
-        if (StringUtils.isBlank(rootPath)) {
-            this.rootPath = ".";
-        } else {
-            this.rootPath = rootPath;
-        }
+    public LocalFileStorageInfrastructure(LocalFileOptions options) {
+        this.options = options;
     }
 
     /**
@@ -72,33 +70,29 @@ public class LocalFileStorageInfrastructure implements FileStorageInfrastructure
      * @param bytes        字节形式的文件内容
      */
     private void write(String absolutePath, byte[] bytes) {
-
         Path path = getPath(absolutePath);
         LocalFileUtils.write(path, bytes);
     }
 
-    private String getFullPathString(String absolutePath) {
-        return conversionOsPath(String.join("/", rootPath, absolutePath));
-    }
-
     private Path getPath(String absolutePath) {
-        String storagePath = getFullPathString(absolutePath);
-        return Paths.get(storagePath);
+        return Paths.get(absolutePath);
     }
 
     /**
-     * 写入文件
+     * 将文件写入临时目录
      *
      * @param fileSummary 文件摘要
      * @param bytes       字节形式的文件内容
      */
     @Override
-    public void write(FileSummary fileSummary, byte[] bytes) {
+    public void writeTemp(FileSummary fileSummary, byte[] bytes) {
+        fileSummary.setStorageDirectory(options.getFullTempDirectory());
         if (StringUtils.isBlank(fileSummary.getStoragePath())) {
             return;
         }
-        String fullPathString = getFullPathString(fileSummary.getStoragePath());
-        write(fullPathString, bytes);
+        log.info(fileSummary.getStoragePath());
+        fileSummary.setType(FileSummary.TEMP_TYPE);
+        write(fileSummary.getStoragePath(), bytes);
         if (StringUtils.isBlank(fileSummary.getMd5())) {
             String fileMd5HexString = LocalFileUtils.getMd5(fileSummary.getStoragePath());
             fileSummary.setMd5(fileMd5HexString);
@@ -112,20 +106,21 @@ public class LocalFileStorageInfrastructure implements FileStorageInfrastructure
     }
 
     /**
-     * 复制文件
+     * 永久固化
      *
-     * @param sourceFileSummary 源文件信息
-     * @param targetDirectory   目标目录
-     * @return 返回复制对象
+     * @param fileSummary 文件摘要
      */
     @Override
-    public FileSummary copy(FileSummary sourceFileSummary, final String targetDirectory) {
-        String storagePath = targetDirectory + File.separator + sourceFileSummary.getId();
-        FileSummary targetFileSummary = ObjectUtils.clone(sourceFileSummary);
-        Path sourcePath = getPath(sourceFileSummary.getStoragePath());
-        Path targetPath = getPath(storagePath);
+    public FileSummary persistence(final FileSummary fileSummary) {
+        if (StringUtils.isBlank(fileSummary.getStoragePath())) {
+            throw new NotFoundFileException();
+        }
+        FileSummary targetFileSummary = ObjectUtils.clone(fileSummary);
+        Path sourcePath = getPath(fileSummary.getStoragePath());
+        targetFileSummary.setStorageDirectory(options.getFullPersistenceDirectory());
+        targetFileSummary.setType(FileSummary.PERSISTENCE_TYPE);
+        Path targetPath = getPath(targetFileSummary.getStoragePath());
         LocalFileUtils.copy(sourcePath, targetPath);
-        targetFileSummary.setStoragePath(storagePath);
         return targetFileSummary;
     }
 
