@@ -15,7 +15,10 @@
  */
 package com.maydear.core.framework.util;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.Base64;
 
 /**
@@ -34,6 +37,11 @@ public class Base64Utils {
         throw new IllegalStateException("Utility class");
     }
 
+    private static final String EXTENSION_JPG = "jpg";
+    private static final String EXTENSION_JPEG = "jpeg";
+    private static final String EXTENSION_GIF = "gif";
+    private static final String EXTENSION_ICO = "ico";
+
     /**
      * 将明文字符串进行Base64编码
      *
@@ -42,6 +50,35 @@ public class Base64Utils {
      */
     public static String encode(String str) {
         return Base64.getUrlEncoder().encodeToString(str.getBytes(StandardCharsets.UTF_8));
+    }
+
+    /**
+     * 将指定路径的图片进行Base64编码（gif/png/jpg/ico）
+     *
+     * @return Base64编码后的字符串
+     */
+    public static String encodeImage(String strPath, String originalFilename) {
+        String base64Content = Base64.getUrlEncoder().encodeToString(LocalFileUtils.read(Path.of(strPath)));
+        if (StringUtils.isNotBlank(originalFilename)) {
+            String extName = StringUtils.substringAfterLast(originalFilename, ".");
+
+            //data:image/gif;base64,base64编码的gif图片数据
+            //data:image/png;base64,base64编码的png图片数据
+            //data:image/jpeg;base64,base64编码的jpeg图片数据
+            //data:image/x-icon;base64,base64编码的icon图片数据
+            if(StringUtils.equalsAnyIgnoreCase(extName,EXTENSION_GIF)){
+                return "data:image/"+EXTENSION_GIF+";base64," + base64Content;
+            }
+
+            if(StringUtils.equalsAnyIgnoreCase(extName,EXTENSION_JPEG) || StringUtils.equalsAnyIgnoreCase(extName,EXTENSION_JPG)){
+                return "data:image/"+EXTENSION_JPG+";base64," + base64Content;
+            }
+            if(StringUtils.equalsAnyIgnoreCase(extName,EXTENSION_ICO)){
+                return "data:image/x-icon;base64," + base64Content;
+            }
+        }
+
+        return "data:image/png;base64," + base64Content;
     }
 
     /**
