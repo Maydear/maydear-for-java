@@ -67,7 +67,6 @@ public class LocalFileOptions implements Serializable {
     public String getFullPersistenceDirectory() {
         StringBuilder stringBuffer = new StringBuilder(SEQUENCE);
 
-
         if (StringUtils.isNotBlank(persistenceDirectory) && StringUtils.endsWithAny(SEQUENCE, persistenceDirectory)) {
             tempDirectory = StringUtils.substring(tempDirectory, 0, tempDirectory.length() - 1);
         }

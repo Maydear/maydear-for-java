@@ -4,8 +4,10 @@ import com.maydear.core.authorization.annotation.AllowAnonymous;
 import com.maydear.core.framework.infrastructure.FileStorageInfrastructure;
 import com.maydear.core.framework.io.FileSummary;
 import com.maydear.core.framework.util.Assert;
+import com.maydear.core.sample.web.event.entity.OperateLogDomainEvent;
 import com.maydear.core.sample.web.model.Attachment;
 import com.maydear.core.springboot.web.exception.FailedUploadException;
+import com.maydear.framework.core.spring.DomainEventBusFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
@@ -56,6 +58,7 @@ public class AttachmentController {
                 .tag(label)
                 .build();
             fileStorageInfrastructure.writeTemp(fileSummary, file.getBytes());
+            DomainEventBusFactory.publish(new OperateLogDomainEvent("aaa"));
             return Attachment.builder()
                 .code(fileSummary.encodeBase64())
                 .label(StringUtils.isBlank(label) ? "" : label)
@@ -70,7 +73,8 @@ public class AttachmentController {
     public Attachment parse(@RequestParam String fileCode) {
         Assert.isNotNull(fileCode, "fileCode不能为空");
         FileSummary fileSummary = FileSummary.parse(fileCode);
-        fileStorageInfrastructure.persistence(fileSummary);
+        fileStorageInfrastructure.writePersistence(fileSummary);
+        DomainEventBusFactory.publish(new OperateLogDomainEvent("aaa"));
         return Attachment.builder()
             .code(fileSummary.encodeBase64())
             .label(StringUtils.isBlank(fileSummary.getTag()) ? "" : fileSummary.getTag())

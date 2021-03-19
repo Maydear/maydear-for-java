@@ -27,18 +27,19 @@ import java.io.InputStream;
  * @version 1.0.0
  */
 public class XmlConverterImpl implements XmlConverter {
+
     @Override
-    public String toXml(Object object) {
+    public String serializa(Object object) {
         return XmlMapper.INSTANCE.toXml(object);
     }
 
     @Override
-    public <T> T fromXml(String content, Class<T> clazz) {
+    public <T> T deserializa(String content, Class<T> clazz) {
         return XmlMapper.INSTANCE.fromXml(content,clazz);
     }
 
     @Override
-    public <T> T fromXml(InputStream stream, Class<T> clazz) {
+    public <T> T deserializa(InputStream stream, Class<T> clazz) {
         return XmlMapper.INSTANCE.fromXml(stream,clazz);
     }
 }

@@ -29,17 +29,17 @@ import java.io.InputStream;
 public class JsonConverterImpl implements JsonConverter {
 
     @Override
-    public String toJson(Object object) {
+    public String serializa(Object object) {
         return JsonMapper.INSTANCE.toJson(object);
     }
 
     @Override
-    public <T> T fromJson(String content, Class<T> clazz) {
+    public <T> T deserializa(String content, Class<T> clazz) {
         return JsonMapper.INSTANCE.fromJson(content,clazz);
     }
 
     @Override
-    public <T> T fromJson(InputStream stream, Class<T> clazz) {
+    public <T> T deserializa(InputStream stream, Class<T> clazz) {
         return JsonMapper.INSTANCE.fromJson(stream,clazz);
     }
 }

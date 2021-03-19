@@ -17,6 +17,8 @@ package com.maydear.framework.core.spring;
 
 import com.maydear.core.framework.AbstractDomainEvent;
 import com.maydear.core.framework.DomainEventBus;
+import com.maydear.framework.core.spring.util.SpringContextUtils;
+import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * 领域事件工厂
@@ -45,9 +47,10 @@ public class DomainEventBusFactory {
      * @param event
      */
     public static void publish(AbstractDomainEvent event) {
-        if (domainEventBus != null) {
-            domainEventBus.publish(event);
+        if(ObjectUtils.isEmpty(domainEventBus)){
+            setDomainEventBus(SpringContextUtils.getBean(DomainEventBus.class));
         }
+        domainEventBus.publish(event);
     }
 
 }

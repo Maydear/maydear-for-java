@@ -16,6 +16,10 @@
         </dependency>
         <dependency>
             <groupId>com.maydear.core</groupId>
+            <artifactId>maydear-framework-spring</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.maydear.core</groupId>
             <artifactId>maydear-springboot-web</artifactId>
         </dependency>
         <dependency>

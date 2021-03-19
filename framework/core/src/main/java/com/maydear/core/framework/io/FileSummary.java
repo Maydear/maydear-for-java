@@ -71,7 +71,7 @@ public class FileSummary implements Serializable, Cloneable {
     /**
      * 摘要类型
      */
-    private String type;
+    private String type = TEMP_TYPE;
 
     /**
      * 标志
@@ -188,15 +188,18 @@ public class FileSummary implements Serializable, Cloneable {
             id = UUIDUtils.generateNoUnderline();
         }
         String dateDirectory = MessageFormat.format("{0}/{1}/{2}", String.valueOf(createTime.getYear()), String.valueOf(createTime.getMonth().getValue()), String.valueOf(createTime.getDayOfMonth()));
-        return MessageFormat.format("{0}/{1}/{2}", storageDirectory, dateDirectory, id);
+        if (StringUtils.isNotBlank(storageDirectory)) {
+            return MessageFormat.format("{0}/{1}/{2}", storageDirectory, dateDirectory, id);
+        }
+        return MessageFormat.format("{0}/{1}", dateDirectory, id);
     }
 
     /**
      * 文件扩展名
      */
-    public String getExtendFilename(){
-        if(StringUtils.isNotBlank(originalFilename)){
-            return StringUtils.substringBeforeLast(originalFilename,".");
+    public String getExtendFilename() {
+        if (StringUtils.isNotBlank(originalFilename)) {
+            return StringUtils.substringBeforeLast(originalFilename, ".");
         }
         return null;
     }

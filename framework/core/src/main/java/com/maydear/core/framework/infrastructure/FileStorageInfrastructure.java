@@ -34,17 +34,26 @@ public interface FileStorageInfrastructure {
     void writeTemp(FileSummary fileSummary, byte[] bytes);
 
     /**
-     * 将文件写入
+     * 将文件直接写入永久存储目录
      *
+     * @param bytes       字节形式的文件内容
      * @param fileSummary 文件摘要
      */
-    FileSummary persistence(final FileSummary fileSummary);
+    void writePersistence(FileSummary fileSummary, byte[] bytes);
 
     /**
-     * 将文件读取
+     * 将文件从临时目录写入永久存储目录
      *
      * @param fileSummary 文件摘要
-     * @return 返回文件的字节
+     * @return 返回写入永久存储目录的路径
+     */
+    FileSummary writePersistence(final FileSummary fileSummary);
+
+    /**
+     * 将永久存储目录的文件读取为文件字节数组
+     *
+     * @param fileSummary 文件摘要
+     * @return 返回文件的字节数组
      */
     byte[] read(FileSummary fileSummary);
 }

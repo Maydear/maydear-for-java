@@ -30,7 +30,7 @@ public interface XmlConverter {
      * @param object 待序列化的对象
      * @return 返回xml格式的字符串
      */
-    String toXml(Object object);
+    String serializa(Object object);
 
     /**
      * 从xml格式的字符串反序列化
@@ -39,7 +39,7 @@ public interface XmlConverter {
      * @param <T> 对象类型
      * @return 返回对象
      */
-    <T> T fromXml(String content, Class<T> clazz);
+    <T> T deserializa(String content, Class<T> clazz);
 
     /**
      * 从输入流反序列化对象
@@ -48,5 +48,5 @@ public interface XmlConverter {
      * @param <T> 对象类型
      * @return 返回对象
      */
-    <T> T fromXml(InputStream stream, Class<T> clazz);
+    <T> T deserializa(InputStream stream, Class<T> clazz);
 }

@@ -30,7 +30,7 @@ public interface JsonConverter {
      * @param object 待序列化的对象
      * @return 返回json格式字符串
      */
-    String toJson(Object object);
+    String serializa(Object object);
 
 
     /**
@@ -40,7 +40,7 @@ public interface JsonConverter {
      * @param <T> 对象泛型
      * @return 返回指定的对象
      */
-    <T> T fromJson(String content, Class<T> clazz);
+    <T> T deserializa(String content, Class<T> clazz);
 
     /**
      * 从输入流反序列化对象
@@ -49,5 +49,5 @@ public interface JsonConverter {
      * @param <T> 对象
      * @return 返回指定的对象
      */
-    <T> T fromJson(InputStream stream, Class<T> clazz);
+    <T> T deserializa(InputStream stream, Class<T> clazz);
 }

@@ -52,30 +52,34 @@ public class LocalFileStorageInfrastructure implements FileStorageInfrastructure
     }
 
     /**
-     * 针对操作系统类型转换路径分隔符
+     * 转换为路径
      *
-     * @param path 路径
-     * @return 返回转换后的路径
+     * @param rootPath     根路径
+     * @param absolutePath 相对路径
+     * @return 返回Path 对象
      */
-    private String conversionOsPath(String path) {
-        String regexSeparator = "/";
-        if (OsUtils.isWindows()) {
-            regexSeparator = "\\\\";
-        }
-        return RegExUtils.replaceAll(path, regexSeparator, File.separator);
+    private Path getPath(String rootPath, String absolutePath) {
+        return Paths.get(rootPath, absolutePath);
     }
 
     /**
-     * @param absolutePath 路径
-     * @param bytes        字节形式的文件内容
+     * 写文件
+     *
+     * @param path        存储路径
+     * @param fileSummary 文件摘要
+     * @param bytes       文件字节数组
      */
-    private void write(String absolutePath, byte[] bytes) {
-        Path path = getPath(absolutePath);
+    private void write(Path path, FileSummary fileSummary, byte[] bytes) {
         LocalFileUtils.write(path, bytes);
-    }
+        if (StringUtils.isBlank(fileSummary.getMd5())) {
+            String fileMd5HexString = LocalFileUtils.getMd5(fileSummary.getStoragePath());
+            fileSummary.setMd5(fileMd5HexString);
+        }
 
-    private Path getPath(String absolutePath) {
-        return Paths.get(absolutePath);
+        if (fileSummary.getSize() <= 0) {
+            long fileSize = LocalFileUtils.getSize(path);
+            fileSummary.setSize(fileSize);
+        }
     }
 
     /**
@@ -86,23 +90,31 @@ public class LocalFileStorageInfrastructure implements FileStorageInfrastructure
      */
     @Override
     public void writeTemp(FileSummary fileSummary, byte[] bytes) {
-        fileSummary.setStorageDirectory(options.getFullTempDirectory());
+
         if (StringUtils.isBlank(fileSummary.getStoragePath())) {
             return;
         }
-        log.info(fileSummary.getStoragePath());
+        log.debug(fileSummary.getStoragePath());
+        Path path = getPath(options.getFullTempDirectory(), fileSummary.getStoragePath());
         fileSummary.setType(FileSummary.TEMP_TYPE);
-        write(fileSummary.getStoragePath(), bytes);
-        if (StringUtils.isBlank(fileSummary.getMd5())) {
-            String fileMd5HexString = LocalFileUtils.getMd5(fileSummary.getStoragePath());
-            fileSummary.setMd5(fileMd5HexString);
-        }
+        write(path, fileSummary, bytes);
+    }
 
-        if (fileSummary.getSize() <= 0) {
-            Path path = getPath(fileSummary.getStoragePath());
-            long fileSize = LocalFileUtils.getSize(path);
-            fileSummary.setSize(fileSize);
+
+    /**
+     * 将文件直接写入永久存储目录
+     *
+     * @param fileSummary 文件摘要
+     * @param bytes       字节形式的文件内容
+     */
+    @Override
+    public void writePersistence(FileSummary fileSummary, byte[] bytes) {
+        if (StringUtils.isBlank(fileSummary.getStoragePath())) {
+            throw new NotFoundFileException();
         }
+        Path path = getPath(options.getFullTempDirectory(), fileSummary.getStoragePath());
+        fileSummary.setType(FileSummary.PERSISTENCE_TYPE);
+        write(path, fileSummary, bytes);
     }
 
     /**
@@ -111,15 +123,14 @@ public class LocalFileStorageInfrastructure implements FileStorageInfrastructure
      * @param fileSummary 文件摘要
      */
     @Override
-    public FileSummary persistence(final FileSummary fileSummary) {
+    public FileSummary writePersistence(final FileSummary fileSummary) {
         if (StringUtils.isBlank(fileSummary.getStoragePath())) {
             throw new NotFoundFileException();
         }
         FileSummary targetFileSummary = ObjectUtils.clone(fileSummary);
-        Path sourcePath = getPath(fileSummary.getStoragePath());
-        targetFileSummary.setStorageDirectory(options.getFullPersistenceDirectory());
+        Path sourcePath = getPath(options.getFullTempDirectory(), fileSummary.getStoragePath());
         targetFileSummary.setType(FileSummary.PERSISTENCE_TYPE);
-        Path targetPath = getPath(targetFileSummary.getStoragePath());
+        Path targetPath = getPath(options.getFullPersistenceDirectory(), targetFileSummary.getStoragePath());
         LocalFileUtils.copy(sourcePath, targetPath);
         return targetFileSummary;
     }
@@ -135,17 +146,7 @@ public class LocalFileStorageInfrastructure implements FileStorageInfrastructure
         if (ObjectUtils.isEmpty(fileSummary)) {
             throw new NotFoundFileException();
         }
-        return read(fileSummary.getStoragePath());
-    }
-
-    /**
-     * 读取文件
-     *
-     * @param absolutePath 路径
-     * @return 返回文件字节
-     */
-    private byte[] read(String absolutePath) {
-        Path path = getPath(absolutePath);
-        return LocalFileUtils.read(path);
+        Path sourcePath = getPath(fileSummary.isTempFile() ? options.getFullTempDirectory() : options.getFullPersistenceDirectory(), fileSummary.getStoragePath());
+        return LocalFileUtils.read(sourcePath);
     }
 }
