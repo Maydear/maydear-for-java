@@ -72,7 +72,7 @@ public class LocalFileStorageInfrastructure implements FileStorageInfrastructure
     private void write(Path path, FileSummary fileSummary, byte[] bytes) {
         LocalFileUtils.write(path, bytes);
         if (StringUtils.isBlank(fileSummary.getMd5())) {
-            String fileMd5HexString = LocalFileUtils.getMd5(fileSummary.getStoragePath());
+            String fileMd5HexString = LocalFileUtils.getMd5(path);
             fileSummary.setMd5(fileMd5HexString);
         }
 

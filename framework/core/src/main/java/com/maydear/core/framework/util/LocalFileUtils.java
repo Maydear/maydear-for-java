@@ -24,10 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 
 /**
  * 本地磁盘文件工具类
@@ -140,7 +137,7 @@ public class LocalFileUtils {
         Assert.isNotNull(source, "[原始路径]不能为空。");
         Assert.isNotNull(target, "[目标路径]不能为空。");
         try {
-            if(!Files.exists(source)){
+            if (!Files.exists(source)) {
                 return;
             }
             LocalFileUtils.createFileIfExists(target);
@@ -205,9 +202,12 @@ public class LocalFileUtils {
      * @param path 文件路径
      * @return
      */
-    public static String getMd5(String path) {
+    public static String getMd5(Path path) {
         try {
-            return DigestUtils.md5Hex(new FileInputStream(path));
+            if (path.toFile().isFile()) {
+                return DigestUtils.md5Hex(Files.newInputStream(path, StandardOpenOption.READ));
+            }
+            return StringUtils.EMPTY;
         } catch (IOException e) {
             throw new NotFoundFileException();
         }
